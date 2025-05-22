@@ -25,3 +25,5 @@ class CategoryListView(ListView):
     context_object_name = 'categories'
 
 
+def index(request):
+    return render(request, 'shop/index.html')
