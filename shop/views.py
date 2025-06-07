@@ -36,7 +36,6 @@ class ProductCreatedView(CreateView):
     success_url = reverse_lazy('staff:products')
 
 # Класс для отображения товаров
-
 class ProductListView(ListView):
     model = Product
     template_name = 'admin_pages/list_product.html'
