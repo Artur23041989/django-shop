@@ -1,5 +1,5 @@
 {% extends 'admin_pages/base.html' %}
-
+{% load static %}
 {% block content %}
 
 <div class="product-detail">
@@ -24,7 +24,7 @@
       </div>
     {% else %}
     <div>
-        Изображение отсутствует
+       <img src="{% static 'img/no_image.png' %}" width="150px" height="auto">
     </div>
     {% endif %}
     <div>
