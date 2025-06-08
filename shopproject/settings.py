@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shop',
     'users',
+    'cart',
     'django_bootstrap5',
 ]
 

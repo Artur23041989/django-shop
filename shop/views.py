@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView,
                                   DetailView,
@@ -9,7 +9,7 @@ from django.views.generic import (CreateView,
 from .forms import CategoryCreateForm, ProductCreateForm
 from . models import Category, Product
 
-#########################           АДМИНКА            ######################
+#########################           АДМИНКА           #########################
 
 # Класс для создания новой категории
 class CategoryCreatedView(CreateView):
@@ -48,4 +48,35 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
     slug_url_kwarg = 'slug'
 
+
+#########################           КЛИЕНТСКАЯ ЧАСТЬ           #########################
+
+class ProductsByCategoryListView(ListView):
+    paginate_by = 2
+    model = Product
+    template_name = 'shop/index.html'
+    context_object_name = 'products'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = Category.objects.all()
+        context['categories'] = categories
+        return context
+
+    def get_queryset(self):
+        # если не выбрана категория товаров
+        # возвращаем все товары
+        if not self.kwargs.get('slug'):
+            return Product.objects.all()
+        # получаем название категории из URL
+        # и возвращаем товары выбранной категории
+        category = get_object_or_404(Category, slug=self.kwargs['slug'])
+        return Product.objects.filter(category=category)
+
+
+class ProductDetailClientView(DetailView):
+    model = Product
+    template_name = 'shop/product_detail.html'
+    context_object_name = 'product'
+    slug_url_kwarg = 'slug'
 

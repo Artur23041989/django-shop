@@ -1,6 +1,201 @@
 {% extends 'shop/base.html' %}
-
+{% load static %}
 
 {% block content %}
-<h2></h2>
+<style>
+    /* Общие стили для блока категорий */
+.categories {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #f8f9fa; /* светлый фон страницы */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Удаляем стандартные стили у списка */
+.categories ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex; /* горизонтальный список */
+  flex-wrap: wrap; /* перенос на новую строку при необходимости */
+  gap: 12px; /* отступы между элементами */
+}
+
+/* Стили для каждого пункта меню */
+.categories li {
+  /* Можно оставить пустым или добавить стили для отдельных элементов */
+}
+
+/* Стиль для ссылок */
+.categories a {
+  display: inline-block;
+  padding: 10px 16px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #007bff; /* синий фон */
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Эффект при наведении */
+.categories a:hover {
+  background-color: #0056b3; /* более темный синий */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Для адаптивности тоже можно добавить: */
+@media (max-width: 768px) {
+  .categories ul {
+    justify-content: center;
+  }
+}
+
+/* Общий контейнер продуктов */
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f8f9fa; /* Светлый фон для раздела */
+}
+
+/* Стиль карточки продукта */
+.product-item {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Название товара */
+.product-item__name {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #333;
+}
+
+.product-item__name a {
+  text-decoration: none;
+  color: #007bff;
+  transition: color 0.3s;
+}
+
+.product-item__name a:hover {
+  color: #0056b3;
+}
+
+/* Цена товара */
+.product-item__price {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #28a745;
+  margin-bottom: 15px;
+}
+
+/* Изображение товара */
+.product-item__image img {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  transition: transform 0.3s;
+}
+
+.product-item__image img:hover {
+  transform: scale(1.05);
+}
+
+.product-item__buttons .btn.btn-info {
+  padding: 4px 8px; /* уменьшить внутренние отступы */
+  font-size: 12px; /* уменьшить размер шрифта */
+  line-height: 1; /* уменьшить высоту строки */
+  min-width: auto; /* убрать минимальную ширину, если она задана */
+  width: auto; /* автоматическая ширина */
+  margin: 0; /* убрать лишние внешние отступы */
+  display: inline-block; /* оставить в виде inline-block */
+  /* Можно добавить, чтобы убрать стандартные маргины и паддинги кнопки */
+}
+
+#favorite-btn {
+  font-size: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#favorite-btn:hover {
+  transform: scale(1.2);
+}
+</style>
+
+<div class = "categories">
+    <ul>
+        {% for category in categories %}
+        <li>
+            <a href="{% url 'shop:index_category' category.slug %}">{{ category.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="products">
+    {% for product in products %}
+    <div class="product-item">
+        <div class="product-item__name">
+            <a href="{% url 'shop:product_detail' slug=product.slug %}">{{ product.name }}</a>
+        </div>
+        <div class="product-item__price">{{ product.price }}</div>
+        <div class="product-item__image">
+            {% if product.image %}
+            <img width="250px" height="auto" src="{{ product.image.url }}">
+            {% else %}
+            <img src="{% static 'img/no_image.png' %}" width="133px" height="auto">
+            {% endif %}
+                <div class="product-item__buttons">
+                <a href="{% url 'shop:product_detail' slug=product.slug %}" class="btn btn-info">ПОДРОБНЕЕ</a>
+                    <form method="post" action="#" style="display:inline;">
+                    {% csrf_token %}
+                     <button type="submit" class="btn btn-primary">В КОРЗИНУ</button>
+                    </form>
+                    <button id="favorite-btn" aria-label="Добавить в избранное" onclick="toggleFavorite()">❤️ в избранное</button>
+                </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<!-- Панель пагинации -->
+<div class="pagination">
+    <span class="page-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo;первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+        {% endif %}
+
+        <span class="current">Страница {{page_obj.number}} из {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock content %}
